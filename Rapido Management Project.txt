@@ -1,0 +1,132 @@
+#include <stdio.h>
+#include <string.h>
+
+// Structure to represent a Rapido ride
+struct Ride {
+    int rideNumber;
+    char destination[50];
+    int availableSeats; // Seats available for booking
+    int totalSeats;     // Total number of seats for the ride
+};
+
+// Function to add a new ride
+void addRide(struct Ride *rides, int *count) {
+    printf("Enter ride number: ");
+    scanf("%d", &rides[*count].rideNumber);
+    getchar(); // Consume the newline character left by scanf
+
+    printf("Enter destination: ");
+    fgets(rides[*count].destination, 50, stdin);
+    rides[*count].destination[strcspn(rides[*count].destination, "\n")] = '\0'; // Remove newline
+
+    printf("Enter total seats: ");
+    scanf("%d", &rides[*count].totalSeats);
+
+    rides[*count].availableSeats = rides[*count].totalSeats; // Initially all seats are available
+    (*count)++;
+    printf("Ride added successfully!\n");
+}
+
+// Function to display all rides
+void displayRides(struct Ride *rides, int count) {
+    if (count == 0) {
+        printf("No rides available.\n");
+    } else {
+        printf("\nList of Rides:\n");
+        printf("Number\tDestination\tAvailable Seats\tTotal Seats\n");
+        printf("-----------------------------------------------------\n");
+        for (int i = 0; i < count; i++) {
+            printf("%d\t%s\t\t%d\t\t%d\n", rides[i].rideNumber, rides[i].destination, 
+                   rides[i].availableSeats, rides[i].totalSeats);
+        }
+    }
+}
+
+// Function to book a seat on a ride
+void bookSeat(struct Ride *rides, int count) {
+    int number;
+    printf("Enter ride number to book: ");
+    scanf("%d", &number);
+
+    int found = 0;
+    for (int i = 0; i < count; i++) {
+        if (rides[i].rideNumber == number) {
+            if (rides[i].availableSeats > 0) {
+                rides[i].availableSeats--; // Decrease available seats
+                printf("Successfully booked a seat for the ride to %s.\n", rides[i].destination);
+            } else {
+                printf("Sorry, no seats available for booking.\n");
+            }
+            found = 1;
+            break;
+        }
+    }
+
+    if (!found) {
+        printf("Ride not found.\n");
+    }
+}
+
+// Function to cancel a booked seat on a ride
+void cancelSeat(struct Ride *rides, int count) {
+    int number;
+    printf("Enter ride number to cancel booking: ");
+    scanf("%d", &number);
+
+    int found = 0;
+    for (int i = 0; i < count; i++) {
+        if (rides[i].rideNumber == number) {
+            if (rides[i].availableSeats < rides[i].totalSeats) {
+                rides[i].availableSeats++; // Increase available seats
+                printf("Successfully canceled a seat booking for the ride to %s.\n", rides[i].destination);
+            } else {
+                printf("No bookings exist for this ride.\n");
+            }
+            found = 1;
+            break;
+        }
+    }
+
+    if (!found) {
+        printf("Ride not found.\n");
+    }
+}
+
+int main() {
+    struct Ride rides[100]; // Array to store rides
+    int count = 0;          // Number of rides in the system
+    int choice;
+
+    while (1) {
+        printf("\nRapido Ride Management System\n");
+        printf("1. Add Ride\n");
+        printf("2. Display All Rides\n");
+        printf("3. Book Seat\n");
+        printf("4. Cancel Seat\n");
+        printf("5. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                addRide(rides, &count);
+                break;
+            case 2:
+                displayRides(rides, count);
+                break;
+            case 3:
+                bookSeat(rides, count);
+                break;
+            case 4:
+                cancelSeat(rides, count);
+                break;
+            case 5:
+                printf("Exiting system...\n");
+                return 0;
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+    }
+
+    return 0;
+}
